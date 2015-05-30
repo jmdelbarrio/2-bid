@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<service id="remoting-service"
+    class="flex.messaging.services.RemotingService">
+
+    <adapters>
+        <adapter-definition id="java-object" class="flex.messaging.services.remoting.adapters.JavaAdapter" default="true"/>
+    </adapters>
+
+    <default-channels>
+        <channel ref="my-amf"/>
+    </default-channels>
+    
+    <destination id="Usuario">
+    	<properties>
+			<source>model.Usuario</source>
+		</properties>		
+	</destination>
+	
+	<destination id="Sistema">
+    	<properties>
+			<source>model.Sistema</source>
+		</properties>		
+	</destination>
+	
+	<destination id="UsuarioDAO">
+    	<properties>
+			<source>dao.UsuarioDAO</source>
+		</properties>		
+	</destination>
+    
+  </service>

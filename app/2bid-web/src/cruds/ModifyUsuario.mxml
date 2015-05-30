@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:TitleWindow xmlns:mx="http://www.adobe.com/2006/mxml"
+layout="vertical" title="Usuario"   width="574" height="342"
+xmlns:validator="validators.*"
+creationComplete="init();"
+showCloseButton="true" close="closeWindow()" verticalAlign="top" verticalScrollPolicy="off" horizontalScrollPolicy="off">
+
+<mx:Script>
+    <![CDATA[
+    	import events.InsertarUsuarioEvent;
+    	import model.business.EnterpriseModelLocator;
+    	import mx.binding.utils.BindingUtils;
+    	import mx.binding.utils.ChangeWatcher;
+    	import model.vo.UsuarioVO;
+      import mx.validators.Validator;
+      import mx.managers.PopUpManager;
+      import mx.rpc.events.FaultEvent;
+	  import mx.rpc.events.ResultEvent;
+	  import mx.controls.Alert;
+	  import cruds.ModifyUsuario;
+	  import validators.*;
+	  
+	  private var myChangeWatcher:ChangeWatcher;
+      private var usuario:UsuarioVO;
+      private var state:String;
+      
+      [Bindable] 
+         private var modelo: EnterpriseModelLocator= EnterpriseModelLocator.Instance; 
+         
+      private function init():void
+      {
+     	 myChangeWatcher=BindingUtils.bindSetter(handlerOkInsertarUsuario, modelo, "insertarUsuarioOk");
+     	 formRadioTipoUsuario.visible=modelo.hayUsuarioAdminLogueado();
+
+     	 this.centerWindow();
+         
+	 }
+          
+      private function centerWindow():void {
+        PopUpManager.centerPopUp(this);
+      }
+      
+      
+      private function handlerOkInsertarUsuario(obj:int):void {
+      	
+		if(modelo.insertarUsuarioOk==0) return;
+			closeWindow();
+			
+		}
+      
+      public function setUsuario(p_usuario:UsuarioVO):void {
+      usuario=p_usuario;
+      txtNombre.text=usuario.nombre;
+      txtEmail.text=usuario.email;
+      txtNick.text=usuario.nick;
+      txtPassword.text=usuario.password;
+      txtNroTarjeta.text=usuario.nro_tarjeta;
+
+      }
+      
+      public function setState(s:String):void {
+      state=s;
+       if (state=="insert") {
+        this.title="Insertar Usuario";
+        } else {
+        this.title="Modificar Usuario";
+        } 
+      }
+      
+      private function save():void{
+        if (!validarDatos()) {            
+            Alert.show("Los valores no son correctos, revisar los campos en rojo", 
+                   "Error en los datos ingresados");
+             return;
+            } 
+      
+      if (state=="insert") {
+      usuario= new UsuarioVO();
+      }
+      usuario.nombre=txtNombre.text;
+      usuario.email=txtEmail.text;
+      usuario.nick=txtNick.text;
+      usuario.password=txtPassword.text;
+      usuario.nro_tarjeta=txtNroTarjeta.text;
+      
+      if (btnComun.selected)
+      {usuario.tipo='C'}
+      else 
+      {usuario.tipo='A'};
+
+      if (state=="insert") {
+      	      	
+      	new InsertarUsuarioEvent(usuario).dispatch();
+       } else {
+      /*new ActualizarClienteEvent(cliente).dispatch();       
+      closeWindow();*/
+      }
+	  }  
+	  
+ 	   private function validarDatos():Boolean{
+			    var validatorArr:Array = new Array();
+			    validatorArr.push(validadorEmail);
+			    //validatorArr.push(validadorTarjeta);
+			    validatorArr.push(pwvPasswords);
+			    validatorArr.push(validadorNombre);
+			    validatorArr.push(validadorNick);
+			    var validatorErrorArray:Array = Validator.validateAll(validatorArr);;
+			    var isFormValido:Boolean = validatorErrorArray.length == 0;
+			    return isFormValido;
+		} 
+		
+
+
+	    
+	
+             
+      
+      private function closeWindow():void{
+ 		  PopUpManager.removePopUp(this);
+	  }
+
+    ]]>
+</mx:Script>
+
+   	<mx:StringValidator id="validadorNombre" 
+        source="{txtNombre}" 
+        property="text"
+        trigger="{btnSave}" triggerEvent="click"
+        requiredFieldError="El nombre es requerido" 
+        required="true"/> 
+
+   	<mx:StringValidator id="validadorNick" 
+        source="{txtNick}" 
+        property="text"
+        trigger="{btnSave}" triggerEvent="click"
+        requiredFieldError="El nick es requerido" 
+        required="true"/> 
+
+   	<mx:EmailValidator id="validadorEmail" 
+        source="{txtEmail}" 
+        property="text"
+        trigger="{btnSave}" triggerEvent="click"
+        requiredFieldError="El email debe tener un formato valido" 
+        required="true"/> 
+        
+        
+     <mx:CreditCardValidator id="validadorTarjeta" 
+        source="{txtNroTarjeta}" 
+        property="text"
+        trigger="{btnSave}" triggerEvent="click"
+        requiredFieldError="La tarjeta de credito debe tener un formato valido" 
+        required="true"/>    
+        
+     <validator:PasswordValidator id="pwvPasswords" 
+     	required="true" 
+     	source="{txtPassword}" 
+     	property="text" 
+     	confirmationSource="{txtRepetirPassword}" 
+     	confirmationProperty="text" trigger="{btnSave}" triggerEvent="click" />
+ 
+        
+            
+  <mx:Form width="516" height="240" horizontalScrollPolicy="off" verticalScrollPolicy="off">
+    <mx:FormItem label="Nombre" horizontalAlign="left">
+      <mx:TextInput id="txtNombre" width="325"/>
+    </mx:FormItem>
+    <mx:FormItem label="email" horizontalAlign="left">
+      <mx:TextInput id="txtEmail" width="325"/>
+    </mx:FormItem>
+    <mx:FormItem label="Nick" horizontalAlign="left">
+      <mx:TextInput id="txtNick" width="325"/>
+    </mx:FormItem>
+    <mx:FormItem label="Password" horizontalAlign="left">
+      <mx:TextInput id="txtPassword" textAlign="left" width="325" displayAsPassword="true"/>
+    </mx:FormItem>
+    <mx:FormItem label="Repertir password" horizontalAlign="left" id="repetirPassword">
+      <mx:TextInput id="txtRepetirPassword" textAlign="left" width="325" displayAsPassword="true"/>
+    </mx:FormItem>
+    <mx:FormItem label="Nro tarjeta de credito" horizontalAlign="left">
+      <mx:TextInput id="txtNroTarjeta" textAlign="left" width="325"/>
+    </mx:FormItem>
+    <mx:FormItem id="formRadioTipoUsuario" label="Tipo de usuario" horizontalAlign="left"  visible="true" width="459">
+ <mx:RadioButton id="btnComun" label="Comun" groupName="radioTipoUsuario" selected="true"/>
+ <mx:RadioButton id="btnAdmin" label="Administrador" groupName="radioTipoUsuario"/>
+    </mx:FormItem>
+    <mx:RadioButtonGroup />
+  </mx:Form>
+  <mx:HBox width="100%" height="28" verticalAlign="middle" horizontalAlign="center">
+    <mx:Button label="Registrarse" click="save()" id="btnSave"/>
+    <mx:Button label="Cancelar" click="closeWindow()"/>
+  </mx:HBox>
+</mx:TitleWindow>

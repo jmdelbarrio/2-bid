@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<cairngorm:ServiceLocator 
+	xmlns:mx="http://www.adobe.com/2006/mxml" 
+	xmlns:cairngorm="com.adobe.cairngorm.business.*">
+	
+    <mx:RemoteObject  id="sistema" destination="Sistema" source="model.Sistema"
+    result="event.token.resultHandler( event );"  
+	fault="event.token.faultHandler( event );"
+    concurrency="multiple" showBusyCursor="true"/>
+           
+    <mx:RemoteObject  id="usuarioDAO" destination="UsuarioDAO" source="dao.UsuarioDAO"
+    	 result="event.token.resultHandler( event );"  
+		 fault="event.token.faultHandler( event );" 
+		 concurrency="multiple" showBusyCursor="true"/>
+        
+   	
+</cairngorm:ServiceLocator>

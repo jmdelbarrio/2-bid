@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:TitleWindow xmlns:mx="http://www.adobe.com/2006/mxml"
+layout="vertical" title="Login"   width="440" height="228"
+xmlns:validator="validators.*"
+creationComplete="init();"
+showCloseButton="true" close="closeWindow()" verticalAlign="top" verticalScrollPolicy="off" horizontalScrollPolicy="off">
+
+<mx:Script>
+    <![CDATA[
+	  import events.LoginEvent;
+	  import model.business.EnterpriseModelLocator;
+	  import mx.binding.utils.BindingUtils;
+	  import mx.binding.utils.ChangeWatcher;
+	  import model.vo.UsuarioVO;
+	  import mx.validators.Validator;
+	  import mx.managers.PopUpManager;
+	  import mx.rpc.events.FaultEvent;
+	  import mx.rpc.events.ResultEvent;
+	  import mx.controls.Alert;
+	  import cruds.Login;
+	  import validators.*;
+	  
+	  private var myChangeWatcher:ChangeWatcher;
+	  private var usuario:UsuarioVO;
+	  private var state:String;
+      
+      [Bindable] 
+         private var modelo: EnterpriseModelLocator= EnterpriseModelLocator.Instance; 
+         
+      private function init():void
+      {
+     	 myChangeWatcher=BindingUtils.bindSetter(handlerLogin, modelo, "login");
+     	 this.centerWindow();
+     	 labelError.visible=false;
+         
+	 }
+          
+      private function centerWindow():void {
+        PopUpManager.centerPopUp(this);
+      }
+      
+      
+      private function handlerLogin(obj:int):void {
+      	
+		if(modelo.login==0) return;
+			closeWindow();
+			
+		}
+      
+      public function setUsuario(p_usuario:UsuarioVO):void {
+      usuario=p_usuario;
+      txtUsuario.text=usuario.nombre;
+      txtPassword.text=usuario.password;
+
+      }
+      
+      public function setState(s:String):void {
+      state=s;
+       if (state=="insert") {
+        this.title="Login";
+        } else {
+        this.title="Login";
+        } 
+      }
+      
+      private function login():void{
+      if (!validarDatos()) {            
+        //Alert.show("Los valores no son correctos, revisar los campos en rojo", 
+        //       "Error en los datos ingresados");
+        labelError.visible=true;
+      	return;
+      } 
+      labelError.visible=false;
+      usuario= new UsuarioVO();
+      usuario.nick=txtUsuario.text;
+      usuario.password=txtPassword.text;
+
+      new LoginEvent(usuario).dispatch();
+	  }  
+	  
+ 	   private function validarDatos():Boolean{
+			    var validatorArr:Array = new Array();
+			    validatorArr.push(validadorUser);
+			    validatorArr.push(validadorPassword);
+			    var validatorErrorArray:Array = Validator.validateAll(validatorArr);;
+			    var isFormValido:Boolean = validatorErrorArray.length == 0;
+			    return isFormValido;
+		} 
+
+      private function closeWindow():void{
+ 		  PopUpManager.removePopUp(this);
+	  }
+	  
+	  private function recuperarPassword():void{
+ 		  Alert.show("Recuperar password");
+	  }
+	  
+	  private function crearCuentaUsuario():void{
+ 		  Alert.show("Crear cuenta de usuario");
+	  }
+	  
+    ]]>
+</mx:Script>
+
+   	<mx:StringValidator id="validadorUser" 
+        source="{txtUsuario}" 
+        property="text"
+        trigger="{btnLogin}" triggerEvent="click"
+        requiredFieldError="El usuario es requerido" 
+        required="true"/> 
+        
+	 <mx:StringValidator id="validadorPassword" 
+	    source="{txtPassword}" 
+	    property="text"
+	    trigger="{btnLogin}" triggerEvent="click"
+	    requiredFieldError="El password es requerido" 
+	    required="true"/> 
+    
+	  <mx:Form width="413" height="89" horizontalScrollPolicy="off" verticalScrollPolicy="off">
+	    <mx:FormItem label="Usuario" horizontalAlign="left">
+	      <mx:TextInput id="txtUsuario" width="320"/>
+	    </mx:FormItem>
+	    <mx:FormItem label="Password" horizontalAlign="left">
+	      <mx:TextInput id="txtPassword" textAlign="left" width="320" displayAsPassword="true"/>
+	  	</mx:FormItem>
+	    <mx:Label id="labelError" text="Verifique los datos ingresados" width="414" textAlign="center" color="red" visible="false">
+	    </mx:Label>
+	  </mx:Form>
+	  
+	  <mx:HBox width="413" height="28" verticalAlign="middle" horizontalAlign="center">
+	    <mx:Button label="Login" click="login()" id="btnLogin"/>
+	    <mx:Button label="Cancelar" click="closeWindow()" />
+	  </mx:HBox>
+	  
+	  <mx:Label text="¿Olvidó su contraseña?" width="414" textAlign="center" click="recuperarPassword();">
+	  </mx:Label>
+	  <mx:Label text="Crear una cuenta de usuario" width="414" textAlign="center" click="crearCuentaUsuario();">
+	  </mx:Label>	  
+</mx:TitleWindow>

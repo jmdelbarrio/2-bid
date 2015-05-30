@@ -1,0 +1,2 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<flexProperties flexServerType="2" serverContextRoot="/2bid-server" serverRoot="C:/blazeds/tomcat/webapps/2bid-server" serverRootURL="http://localhost:8400/2bid-server/" toolCompile="true" useServerFlexSDK="false" version="1"/>

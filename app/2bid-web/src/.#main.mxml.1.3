@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Application xmlns:mx="http://www.adobe.com/2006/mxml" 
+	xmlns:business="model.business.*" 
+	xmlns:control="control.*"
+	creationComplete="init();"
+	layout="absolute">
+	
+	<control:TwoBidControl id="control"/>
+	<business:Services id="services"/>
+	<mx:Button x="33" y="62" label="Nuevo Usuario" id="btnNuevoUsuario" click="nuevoUsuario();"/>
+
+	<mx:Script>
+    <![CDATA[
+    
+    import model.business.EnterpriseModelLocator;
+    import mx.binding.utils.BindingUtils;
+    import mx.core.IFlexDisplayObject; 
+    import mx.managers.PopUpManager;
+    import cruds.ModifyUsuario;
+	import mx.controls.Menu;
+    import mx.events.MenuEvent;
+    import mx.controls.Alert;
+    
+    [Bindable] 
+         private var model: EnterpriseModelLocator= EnterpriseModelLocator.Instance; 
+        
+        
+        var modifyUsuarioWindow:IFlexDisplayObject;
+        var myModifyUsuarioWindow:ModifyUsuario;   
+        
+         public  function init():void
+         {
+         
+         BindingUtils.bindSetter(handlerOkInsertarUsuario, model, "insertarUsuarioOk");
+        
+         model=EnterpriseModelLocator.Instance;
+         
+         }
+         
+         private function handlerOkInsertarUsuario(obj:Object):void {
+		if(!obj) return;
+		//Alert.show("Usuario insertado");
+		//cmbUsuario.prompt=model.ultimoUsuarioInsertado.cl_nombre;
+		model.insertarUsuarioOk=false;	
+		}
+         
+        private function nuevoUsuario():void {			 
+           // show the popup
+           	model.insertarUsuarioOk=false;
+            modifyUsuarioWindow=PopUpManager.createPopUp(DisplayObject(parentDocument),ModifyUsuario, true);
+            myModifyUsuarioWindow=ModifyUsuario(modifyUsuarioWindow);
+            myModifyUsuarioWindow.setState("insert");
+           }
+    
+    
+    	     ]]>	     
+
+        <![CDATA[
+            // Import the Menu control.
+            import mx.controls.Menu;
+    
+            [Bindable]
+            [Embed(source="assets/topIcon.jpg")]
+            public var myTopIcon:Class;
+    
+            [Bindable]
+            [Embed(source="assets/radioIcon.jpg")]
+            public var myRadioIcon:Class;
+    
+            [Bindable]
+            [Embed(source="assets/checkIcon.gif")]
+            public var myCheckIcon:Class;
+
+            // Create and display the Menu control.
+            private function createAndShow():void {
+                var myMenu:Menu = Menu.createMenu(null, myMenuData, false);
+                myMenu.labelField="@label";
+
+                // Specify the check icon.
+                myMenu.setStyle('checkIcon', myCheckIcon);
+
+                // Specify the radio button icon.
+                myMenu.setStyle('radioIcon', myRadioIcon);
+
+                // Specify the icon for the topmenu items.
+                myMenu.iconField="@icon";
+                myMenu.addEventListener(MenuEvent.ITEM_CLICK, menuShowInfo);
+                myMenu.show(10, 10);
+            }
+  
+        
+        private function menuShowInfo (event:MenuEvent):void {
+            if (event.label == "Registro") {
+            	return nuevoUsuario();	     	
+            }
+
+            
+        }  
+		]]>     
+    </mx:Script>
+<!-- Define the menu data. -->
+    <mx:XML format="e4x" id="myMenuData">
+        <root>
+            <menuitem label="Usuario" icon="myTopIcon">
+                <menuitem label="Registro"/>
+                <menuitem label="Login"/>
+            </menuitem>
+            <menuitem label="Subastas" type="check" toggled="true"/>
+            <menuitem label="Preguntas" type="check" toggled="false" icon="myTopIcon" enabled="false"/>
+            <menuitem type="separator"/>     
+            <menuitem label="MenuItem D" icon="myTopIcon">
+                <menuitem label="SubMenuItem D-1" type="radio" groupName="one"/>
+                <menuitem label="SubMenuItem D-2" type="radio" groupName="one" toggled="true"/>
+                <menuitem label="SubMenuItem D-3" type="radio" groupName="one"/>
+            </menuitem>
+        </root>
+    </mx:XML>
+
+    <mx:VBox>
+        <!-- Define a Button control to open the menu -->
+        <mx:Button id="myButton" 
+            label="Menú" 
+            click="createAndShow();"/>
+    </mx:VBox>
+</mx:Application>
